@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -21,12 +22,12 @@ class _SplashScreenState extends State<SplashScreen> {
     // Delay the execution by 2 seconds
     await Future.delayed(const Duration(seconds: 2));
 
-    // Check if the photos/storage permission is already granted
+    //  Check if the photos/storage permission is already granted
     final status = await Permission.photos.status;
 
     if (status.isGranted) {
-      // If granted, navigate directly to the album screen
-    //  Navigator.pushReplacementNamed(context, '/album');
+      //  If granted, navigate directly to the album screen
+      Navigator.pushReplacementNamed(context, '/album');
     } else {
       //  Otherwise, navigate to the permission screen
       Navigator.pushReplacementNamed(context, '/permission');
@@ -37,7 +38,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: Center(
         child: Image.asset(
           'assets/splash_img.png',
@@ -48,7 +48,3 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 }
-
-
-
-

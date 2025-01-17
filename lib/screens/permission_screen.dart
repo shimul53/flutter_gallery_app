@@ -20,26 +20,32 @@ class _PermissionScreenState extends State<PermissionScreen> {
     });
 
     // Request permission
-    final status = await Permission.photos.request();
+    final permission = (await Permission.photos.request()).isGranted ||
+        (await Permission.storage.request()).isGranted;
 
-
-    if (status.isGranted) {
+    if (permission) {
       // If user just granted, navigate to album
       if (!mounted) return;
-      //Navigator.pushReplacementNamed(context, '/album');
-    } else if (status.isDenied) {
-      setState(() {
-        _statusMessage = "Permission denied. Please grant to continue.";
-      });
-    } else if (status.isPermanentlyDenied) {
-      setState(() {
-        _statusMessage = "Permission permanently denied. Open settings to enable.";
-      });
+      Navigator.pushReplacementNamed(context, '/album');
+    } else {
+      final status = await Permission.photos.status;
+      if (status.isDenied || (await Permission.storage.status).isDenied) {
+        setState(() {
+          _statusMessage = "Permission denied. Please grant to continue.";
+        });
+      } else if (status.isPermanentlyDenied ||
+          (await Permission.storage.status).isPermanentlyDenied) {
+        setState(() {
+          _statusMessage = "Permission permanently denied. Open settings to enable.";
+        });
 
+        await openAppSettings();
+      }
     }
 
     setState(() => _isRequesting = false);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +55,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
         child: Column(
           children: [
             const Spacer(),
-
+            // Add the image here
             Image.asset(
               'assets/permission_img.png',
               width: 150,
@@ -68,12 +74,12 @@ class _PermissionScreenState extends State<PermissionScreen> {
             ),
             const SizedBox(height: 30),
             SizedBox(
-              width: 280,
+              width: 280, // Makes the button take up the full width of its parent
               child: ElevatedButton(
                 onPressed: _isRequesting ? null : _requestPermission,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF66FFB6),
-                  foregroundColor: Colors.black,
+                  backgroundColor: const Color(0xFF66FFB6), // Set button color
+                  foregroundColor: Colors.black, // Set text color
                 ),
                 child: const Text("Grant Access"),
               ),
